@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MythicPartyConditions:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MythicPartyConditions_jar</output-path>
+    <root id="archive" name="MythicPartyConditions.jar">
+      <element id="module-output" name="MythicPartyConditions" />
+    </root>
+  </artifact>
+</component>
