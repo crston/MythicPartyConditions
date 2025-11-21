@@ -21,6 +21,7 @@ public class MythicPartyConditions extends JavaPlugin implements Listener {
             ISkillCondition cond = new PartyWithinSkillCondition(event.getConditionName(), config);
             event.register(cond);
         }
+
         if (event.getConditionName().equalsIgnoreCase("partyowner")) {
             MythicLineConfig config = event.getConfig();
             ISkillCondition cond = new PartyOwnerSkillCondition(event.getConditionName(), config);
@@ -28,4 +29,3 @@ public class MythicPartyConditions extends JavaPlugin implements Listener {
         }
     }
 }
-

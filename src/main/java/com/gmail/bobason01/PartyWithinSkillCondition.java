@@ -5,10 +5,15 @@ import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.SkillCaster;
 import io.lumine.mythic.api.skills.conditions.ICasterCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import net.Indyuce.mmocore.api.player.PlayerData;
+import net.Indyuce.mmocore.party.provided.Party;
 import net.playavalon.mythicdungeons.api.MythicDungeonsService;
 import net.playavalon.mythicdungeons.api.party.IDungeonParty;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PartyWithinSkillCondition implements ICasterCondition, IEntityCondition {
 
@@ -38,23 +43,47 @@ public class PartyWithinSkillCondition implements ICasterCondition, IEntityCondi
     }
 
     private boolean checkPlayer(Player base) {
-        MythicDungeonsService svc = Bukkit.getServicesManager().load(MythicDungeonsService.class);
-        if (svc == null) return false;
-        IDungeonParty party = svc.getParty(base);
-        if (party == null) return false;
         int count = 0;
         var baseLoc = base.getLocation();
         var baseWorld = baseLoc.getWorld();
-        for (Player member : party.getPlayers()) {
+
+        for (Player member : getPartyMembers(base)) {
             if (member == null) continue;
             if (member.equals(base)) continue;
             if (!member.isOnline()) continue;
             if (member.getWorld() != baseWorld) continue;
+
             if (member.getLocation().distanceSquared(baseLoc) <= distanceSquared) {
                 count++;
                 if (count >= minMembers) return true;
             }
         }
         return false;
+    }
+
+    private Iterable<Player> getPartyMembers(Player player) {
+
+        MythicDungeonsService svc =
+                Bukkit.getServicesManager().load(MythicDungeonsService.class);
+
+        if (svc != null) {
+            IDungeonParty mdParty = svc.getParty(player);
+            if (mdParty != null) return mdParty.getPlayers();
+        }
+
+        PlayerData pd = PlayerData.get(player);
+        if (pd != null) {
+            Party mmocoreParty = (Party) pd.getParty();
+            if (mmocoreParty != null) {
+                List<Player> result = new ArrayList<>();
+                for (PlayerData member : mmocoreParty.getOnlineMembers()) {
+                    Player p = member.getPlayer();
+                    if (p != null) result.add(p);
+                }
+                return result;
+            }
+        }
+
+        return java.util.Collections.emptyList();
     }
 }
